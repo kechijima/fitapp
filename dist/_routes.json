@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/_nuxt/*",
+    "/favicon.ico",
+    "/manifest.webmanifest",
+    "/pwa-192x192.png",
+    "/pwa-512x512.png",
+    "/robots.txt",
+    "/sw.js",
+    "/workbox-1ef09536.js"
+  ]
+}
