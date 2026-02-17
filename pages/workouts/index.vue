@@ -301,6 +301,43 @@ const formatDate = (dateStr: string) => {
   align-items: center;
   margin-bottom: 2rem;
 }
+
+/* 記録するボタンなどの基本スタイル */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+}
+.btn-add {
+  background: #00dc82;
+  color: #054a29;
+  box-shadow: 0 4px 6px -1px rgba(0, 220, 130, 0.2);
+}
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 220, 130, 0.3);
+}
+.btn-text {
+  background: none;
+  border: none;
+  color: #00dc82;
+  font-weight: 800;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+.btn-text:hover {
+  text-decoration: underline;
+}
+
 .header h1 {
   margin: 0;
   font-size: 1.75rem;
