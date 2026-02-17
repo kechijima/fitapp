@@ -1,0 +1,182 @@
+﻿
+> dev
+> nuxt dev -o
+
+npm : 
+発生場所 行:1 文字:36
++ Remove-Item -Recurse -Force
+ .nuxt; npm run dev -- -o 2>&
+1 | Out-File  ...
++                            
+        ~~~~~~~~~~~~~~~~~~~~~
+~
+    + CategoryInfo           
+   : NotSpecified: (:String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+[41m[30m ERROR [39m[49m C
+annot find native binding. np
+m has a bug related to option
+al dependencies (https://gith
+ub.com/npm/cli/issues/4828). 
+Please try [36mnpm i[39m ag
+ain after removing both packa
+ge-lock.json and node_modules
+ directory.
+
+    [90mat [39m/C:/Users/al
+lja/Desktop/Workspace/fitapp/
+node_modules/oxc-parser/src-j
+s/bindings.js:575:11
+    [90mat [39mModuleJob.ru
+n ([36mnode:internal/modules
+/esm/module_job:222:25[39m)
+    [90mat [39masync Module
+Loader.import ([36mnode:inte
+rnal/modules/esm/loader:323:2
+4[39m)
+    [90mat [39masync Module
+.loadNuxt ([36m/C:/Users/all
+ja/Desktop/Workspace/fitapp/n
+ode_modules/nuxt/node_modules
+/@nuxt/kit/dist/index.mjs:885
+:23[39m)
+    [90mat [39masync #loadN
+uxtInstance ([36m/C:/Users/a
+llja/Desktop/Workspace/fitapp
+/node_modules/@nuxt/cli/dist/
+dev-ChFC_-E8.mjs:435:23[39m)
+    [90mat [39masync NuxtDe
+vServer.init ([36m/C:/Users/
+allja/Desktop/Workspace/fitap
+p/node_modules/@nuxt/cli/dist
+/dev-ChFC_-E8.mjs:382:3[39m)
+    [90mat [39masync initia
+lize ([36m/C:/Users/allja/De
+sktop/Workspace/fitapp/node_m
+odules/@nuxt/cli/dist/dev-ChF
+C_-E8.mjs:687:2[39m)
+    [90mat [39masync Object
+.run ([36m/C:/Users/allja/De
+sktop/Workspace/fitapp/node_m
+odules/@nuxt/cli/dist/dev-bt4
+if7SS.mjs:205:51[39m)
+    [90mat [39masync runCom
+mand ([36m/C:/Users/allja/De
+sktop/Workspace/fitapp/node_m
+odules/@nuxt/cli/node_modules
+/citty/dist/index.mjs:188:47
+[39m)
+    [90mat [39masync runCom
+mand ([36m/C:/Users/allja/De
+sktop/Workspace/fitapp/node_m
+odules/@nuxt/cli/node_modules
+/citty/dist/index.mjs:185:21
+[39m)
+
+  [cause]: Cannot find module
+ '@oxc-parser/binding-win32-x
+64-msvc'
+Require stack:
+- C:\Users\allja\Desktop\Work
+space\fitapp\node_modules\oxc
+-parser\src-js\bindings.js
+
+      [90mat [39mModule._re
+solveFilename ([36mnode:inte
+rnal/modules/cjs/loader:1143:
+15[39m)
+      [90mat [39mModule._lo
+ad ([36mnode:internal/module
+s/cjs/loader:984:27[39m)
+      [90mat [39mModule.req
+uire ([36mnode:internal/modu
+les/cjs/loader:1231:19[39m)
+      [90mat [39mrequire (
+[36mnode:internal/modules/hel
+pers:179:18[39m)
+      [90mat [39mrequireNat
+ive ([36m/C:/Users/allja/Des
+ktop/Workspace/fitapp/node_mo
+dules/oxc-parser/src-js/bindi
+ngs.js:135:25[39m)
+      [90mat [39m/C:/Users/
+allja/Desktop/Workspace/fitap
+p/node_modules/oxc-parser/src
+-js/bindings.js:530:17
+      [90mat [39mModuleJob.
+run ([36mnode:internal/modul
+es/esm/module_job:222:25[39m
+)
+      [90mat [39masync Modu
+leLoader.import ([36mnode:in
+ternal/modules/esm/loader:323
+:24[39m)
+      [90mat [39masync Modu
+le.loadNuxt ([36m/C:/Users/a
+llja/Desktop/Workspace/fitapp
+/node_modules/nuxt/node_modul
+es/@nuxt/kit/dist/index.mjs:8
+85:23[39m)
+      [90mat [39masync #loa
+dNuxtInstance ([36m/C:/Users
+/allja/Desktop/Workspace/fita
+pp/node_modules/@nuxt/cli/dis
+t/dev-ChFC_-E8.mjs:435:23[39
+m)
+
+    [cause]: Cannot find modu
+le './parser.win32-x64-msvc.n
+ode'
+Require stack:
+- C:\Users\allja\Desktop\Work
+space\fitapp\node_modules\oxc
+-parser\src-js\bindings.js
+
+        [90mat [39mModule._
+resolveFilename ([36mnode:in
+ternal/modules/cjs/loader:114
+3:15[39m)
+        [90mat [39mModule._
+load ([36mnode:internal/modu
+les/cjs/loader:984:27[39m)
+        [90mat [39mModule.r
+equire ([36mnode:internal/mo
+dules/cjs/loader:1231:19[39m
+)
+        [90mat [39mrequire 
+([36mnode:internal/modules/h
+elpers:179:18[39m)
+        [90mat [39mrequireN
+ative ([36m/C:/Users/allja/D
+esktop/Workspace/fitapp/node_
+modules/oxc-parser/src-js/bin
+dings.js:130:16[39m)
+        [90mat [39m/C:/User
+s/allja/Desktop/Workspace/fit
+app/node_modules/oxc-parser/s
+rc-js/bindings.js:530:17
+        [90mat [39mModuleJo
+b.run ([36mnode:internal/mod
+ules/esm/module_job:222:25[3
+9m)
+        [90mat [39masync Mo
+duleLoader.import ([36mnode:
+internal/modules/esm/loader:3
+23:24[39m)
+        [90mat [39masync Mo
+dule.loadNuxt ([36m/C:/Users
+/allja/Desktop/Workspace/fita
+pp/node_modules/nuxt/node_mod
+ules/@nuxt/kit/dist/index.mjs
+:885:23[39m)
+        [90mat [39masync #l
+oadNuxtInstance ([36m/C:/Use
+rs/allja/Desktop/Workspace/fi
+tapp/node_modules/@nuxt/cli/d
+ist/dev-ChFC_-E8.mjs:435:23[
+39m) 
+
+
