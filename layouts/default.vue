@@ -12,15 +12,21 @@ const handleLogout = async () => {
   <div class="layout-container">
     <header>
       <nav>
-        <NuxtLink to="/" class="brand">💪 FitApp</NuxtLink>
+        <NuxtLink to="/" class="brand">
+          <span class="mdi mdi-arm-flex"></span> FitApp
+        </NuxtLink>
         <div class="nav-links">
           <template v-if="user">
-            <NuxtLink to="/workouts">ワークアウト</NuxtLink>
-            <button @click="handleLogout" class="logout-btn">ログアウト</button>
+            <NuxtLink to="/workouts">
+              <span class="mdi mdi-dumbbell"></span> ワークアウト
+            </NuxtLink>
+            <button @click="handleLogout" class="logout-btn">
+              <span class="mdi mdi-logout"></span> ログアウト
+            </button>
           </template>
           <template v-else>
             <NuxtLink to="/login">ログイン</NuxtLink>
-            <NuxtLink to="/signup">新規登録</NuxtLink>
+            <NuxtLink to="/signup" class="signup-link">新規登録</NuxtLink>
           </template>
         </div>
       </nav>
@@ -32,71 +38,125 @@ const handleLogout = async () => {
 </template>
 
 <style>
+:root {
+  --primary-color: #ff9800;
+  --primary-dark: #f57c00;
+  --secondary-color: #000000;
+  --bg-color: #ffffff;
+  --surface-color: #f8f9fa;
+  --text-primary: #1e1e1e;
+  --text-secondary: #6c757d;
+  --border-color: #dee2e6;
+  --error-color: #dc3545;
+}
+
 * {
   box-sizing: border-box;
 }
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f8fafc;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  line-height: 1.6;
 }
+
 .layout-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
+
 header {
-  padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: white;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
   z-index: 100;
 }
+
 nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .brand {
-  font-weight: bold;
-  font-size: 1.25rem;
+  font-weight: 900;
+  font-size: 1.75rem;
   text-decoration: none;
-  color: #0f172a;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
 }
+
+.brand .mdi {
+  color: var(--primary-color);
+}
+
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
+
 .nav-links a {
   text-decoration: none;
-  color: #64748b;
-  transition: color 0.2s;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
+
 .nav-links a:hover,
 .nav-links a.router-link-active {
-  color: #00dc82;
+  color: var(--primary-color);
 }
+
+.signup-link {
+  background: var(--primary-color);
+  color: #000 !important;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700 !important;
+}
+
+.signup-link:hover {
+  background: #f57c00;
+  transform: translateY(-1px);
+}
+
 .logout-btn {
   padding: 0.5rem 1rem;
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  background: #fff;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.875rem;
-  transition: background 0.2s;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
+
 .logout-btn:hover {
-  background: #dc2626;
+  background: #fff0f0;
+  border-color: var(--error-color);
+  color: var(--error-color);
 }
+
 main {
   flex: 1;
-  padding: 1rem;
+  padding: 2rem 1rem;
 }
 </style>
 

@@ -7,7 +7,9 @@ const client = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 const workouts = ref<Workout[]>([])
 const loading = ref(true)
-const selectedDate = ref<string | null>(null)
+const today = new Date()
+const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+const selectedDate = ref<string | null>(todayStr)
 const selectedExercises = ref<string[]>([])
 const statsSearchQuery = ref('')
 const showStatsDropdown = ref(false)
@@ -152,8 +154,10 @@ const formatDate = (dateStr: string) => {
 <template>
   <div class="workouts-container">
     <div class="header">
-      <h1>ワークアウト</h1>
-      <NuxtLink :to="`/workouts/add${selectedDate ? '?date=' + selectedDate : ''}`" class="btn btn-add">＋ 記録する</NuxtLink>
+      <h1><span class="mdi mdi-clipboard-text-clock-outline"></span> ワークアウト</h1>
+      <NuxtLink :to="`/workouts/add${selectedDate ? '?date=' + selectedDate : ''}`" class="btn btn-add">
+        <span class="mdi mdi-plus"></span> 記録する
+      </NuxtLink>
     </div>
 
     <div class="dashboard-grid">
@@ -161,6 +165,7 @@ const formatDate = (dateStr: string) => {
       <div class="sidebar">
         <WorkoutCalendar 
           :workout-dates="workoutDates" 
+          :selected-date="selectedDate"
           @select-date="date => selectedDate = (selectedDate === date ? null : date)" 
           class="mb-6"
         />
@@ -235,6 +240,7 @@ const formatDate = (dateStr: string) => {
         <div class="section-header">
           <div class="title-with-badge">
             <h2>
+              <span class="mdi mdi-history"></span>
               {{ selectedDate ? formatDate(selectedDate) : (selectedExercises.length > 0 ? '絞り込み中' : 'すべての履歴') }}
             </h2>
             <span v-if="selectedDate || selectedExercises.length > 0" class="filter-badge">
@@ -244,10 +250,13 @@ const formatDate = (dateStr: string) => {
           <button v-if="selectedDate || selectedExercises.length > 0" @click="clearFilters" class="btn-text">すべて表示</button>
         </div>
 
-        <div v-if="loading" class="loading">読み込み中...</div>
+        <div v-if="loading" class="loading">
+          <div class="spinner"></div>
+          読み込み中...
+        </div>
         
         <div v-else-if="filteredWorkouts.length === 0" class="empty">
-          <div class="empty-icon">📂</div>
+          <div class="empty-icon mdi mdi-folder-open-outline"></div>
           <p>該当する記録がありません</p>
         </div>
 
@@ -268,18 +277,24 @@ const formatDate = (dateStr: string) => {
                   <div v-if="(workout as any).workout_sets.length > 3" class="set-more" title="さらに表示">...</div>
                 </div>
                 <div v-else class="summary-line">
-                  <span class="summary-item">⚖️ {{ workout.weight }}kg</span>
-                  <span class="summary-item">📊 {{ workout.sets }}s</span>
-                  <span class="summary-item">🔁 {{ workout.reps }}r</span>
+                  <span class="summary-item"><span class="mdi mdi-weight"></span> {{ workout.weight }}kg</span>
+                  <span class="summary-item"><span class="mdi mdi-layers-outline"></span> {{ workout.sets }}s</span>
+                  <span class="summary-item"><span class="mdi mdi-repeat"></span> {{ workout.reps }}r</span>
                 </div>
               </div>
 
               <div class="card-actions">
-                <NuxtLink :to="`/workouts/edit/${workout.id}`" class="icon-btn" title="編集">✏️</NuxtLink>
-                <button @click="deleteWorkout(workout.id)" class="icon-btn del" title="削除">🗑️</button>
+                <NuxtLink :to="`/workouts/edit/${workout.id}`" class="icon-btn edit-btn" title="編集">
+                  <span class="mdi mdi-pencil-outline"></span>
+                </NuxtLink>
+                <button @click="deleteWorkout(workout.id)" class="icon-btn del-btn" title="削除">
+                  <span class="mdi mdi-delete-outline"></span>
+                </button>
               </div>
             </div>
-            <p v-if="workout.note" class="card-note">{{ workout.note }}</p>
+            <p v-if="workout.note" class="card-note">
+              <span class="mdi mdi-note-text-outline"></span> {{ workout.note }}
+            </p>
           </div>
         </div>
       </div>
@@ -289,7 +304,7 @@ const formatDate = (dateStr: string) => {
 
 <style scoped>
 .workouts-container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 1rem;
 }
@@ -299,57 +314,65 @@ const formatDate = (dateStr: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-}
-
-/* 記録するボタンなどの基本スタイル */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.6rem 1.2rem;
-  border-radius: 12px;
-  font-weight: 800;
-  font-size: 0.875rem;
-  text-decoration: none;
-  transition: all 0.2s;
-  cursor: pointer;
-  border: none;
-}
-.btn-add {
-  background: #00dc82;
-  color: #054a29;
-  box-shadow: 0 4px 6px -1px rgba(0, 220, 130, 0.2);
-}
-.btn-add:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 220, 130, 0.3);
-}
-.btn-text {
-  background: none;
-  border: none;
-  color: #00dc82;
-  font-weight: 800;
-  font-size: 0.8125rem;
-  cursor: pointer;
-  padding: 0.5rem;
-}
-.btn-text:hover {
-  text-decoration: underline;
+  margin-bottom: 2.5rem;
 }
 
 .header h1 {
   margin: 0;
-  font-size: 1.75rem;
-  color: #0f172a;
+  font-size: 2rem;
+  color: #ffffff;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header h1 .mdi {
+  color: #ff9800;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+}
+.btn-add {
+  background: #ff9800;
+  color: #000000;
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+}
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+  background: #f57c00;
+}
+.btn-text {
+  background: none;
+  border: none;
+  color: #ff9800;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: all 0.2s;
+}
+.btn-text:hover {
+  color: #ffffff;
 }
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 2rem;
+  grid-template-columns: 320px 1fr;
+  gap: 2.5rem;
 }
 
 @media (max-width: 1000px) {
@@ -360,18 +383,18 @@ const formatDate = (dateStr: string) => {
 }
 
 .stats-card {
-  background: white;
-  padding: 1.25rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f1f5f9;
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
 }
 .stats-card h3 {
-  margin: 0 0 1rem 0;
-  font-size: 0.75rem;
-  color: #94a3b8;
+  margin: 0 0 1.25rem 0;
+  font-size: 0.8rem;
+  color: #666;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   font-weight: 800;
 }
 
@@ -382,13 +405,18 @@ const formatDate = (dateStr: string) => {
 .combobox-input-wrapper {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
-  padding: 0.4rem 0.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: white;
-  min-height: 42px;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  background: #f8f9fa;
+  min-height: 48px;
   cursor: text;
+  transition: border-color 0.2s;
+}
+.combobox-input-wrapper:focus-within {
+  border-color: #ff9800;
+  background: #fff;
 }
 .chips-area {
   display: flex;
@@ -396,11 +424,10 @@ const formatDate = (dateStr: string) => {
   gap: 0.25rem;
 }
 .filter-chip {
-  background: #f0fdf4;
-  color: #054a29;
-  border: 1px solid #bbf7d0;
-  padding: 0.125rem 0.5rem;
-  border-radius: 6px;
+  background: #ff9800;
+  color: #000;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 700;
   display: flex;
@@ -410,18 +437,20 @@ const formatDate = (dateStr: string) => {
 .chip-remove {
   background: none;
   border: none;
-  font-size: 0.875rem;
-  color: #166534;
+  font-size: 1rem;
+  color: #000;
   cursor: pointer;
   padding: 0;
-  line-height: 1;
+  display: flex;
 }
 .combobox-input {
   border: none;
+  background: transparent;
   flex: 1;
-  min-width: 60px;
-  font-size: 0.875rem;
+  min-width: 80px;
+  font-size: 0.9rem;
   padding: 0.25rem;
+  color: #000;
 }
 .combobox-input:focus { outline: none; }
 
@@ -431,119 +460,178 @@ const formatDate = (dateStr: string) => {
   left: 0;
   right: 0;
   z-index: 50;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  margin-top: 0.25rem;
-  max-height: 200px;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  margin-top: 0.5rem;
+  max-height: 250px;
   overflow-y: auto;
 }
 .dropdown-item {
-  padding: 0.6rem 1rem;
-  font-size: 0.8125rem;
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
 }
-.dropdown-item:hover { background: #f8fafc; color: #00dc82; }
-.dropdown-empty { padding: 1rem; text-align: center; color: #94a3b8; font-size: 0.75rem; }
+.dropdown-item:hover { background: #f8f9fa; color: #ff9800; }
+.dropdown-empty { padding: 1.5rem; text-align: center; color: #adb5bd; font-size: 0.8rem; }
 
 .stats-divider {
   height: 1px;
-  background: #f1f5f9;
-  margin: 1rem 0;
+  background: #eee;
+  margin: 1.5rem 0;
 }
 
 .stat-row {
-  padding: 0.6rem 0.75rem;
-  border-radius: 10px;
-  margin-bottom: 0.5rem;
-  background: #f8fafc;
-  border: 1px solid #f1f5f9;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  background: #f8f9fa;
+  border: 1px solid #eee;
+  transition: all 0.2s;
+}
+.stat-row:hover {
+  border-color: #dee2e6;
+  transform: translateX(4px);
 }
 .stat-name {
   font-weight: 700;
-  margin-bottom: 0.2rem;
-  font-size: 0.8125rem;
-  color: #1e293b;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #000;
 }
 .stat-values {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 .stat-item .label {
-  font-size: 0.65rem;
-  color: #94a3b8;
+  font-size: 0.7rem;
+  color: #666;
   font-weight: 800;
+  text-transform: uppercase;
+  display: block;
 }
 .stat-item .value {
-  font-size: 0.9375rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  color: #00dc82;
+  color: #ff9800;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 .title-with-badge {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
 }
-.title-with-badge h2 { font-size: 1.25rem; font-weight: 800; margin: 0; }
+.title-with-badge h2 { 
+  font-size: 1.5rem; 
+  font-weight: 800; 
+  margin: 0; 
+  color: #000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.title-with-badge h2 .mdi {
+  color: #ff9800;
+}
 .filter-badge {
-  background: #00dc82;
-  color: #054a29;
-  font-size: 0.65rem;
-  padding: 0.2rem 0.6rem;
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 100px;
   font-weight: 800;
-  text-transform: uppercase;
+  border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: #666;
+  gap: 1rem;
+}
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top-color: #ff9800;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: #f8f9fa;
+  border-radius: 20px;
+  border: 2px dashed #dee2e6;
+}
+.empty-icon {
+  font-size: 4rem;
+  color: #ced4da;
+  margin-bottom: 1rem;
+}
+.empty p {
+  color: #6c757d;
+  font-size: 1.1rem;
 }
 
 .workout-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .workout-card.compact {
-  background: white;
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-  border: 1px solid #f1f5f9;
-  transition: transform 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .workout-card.compact:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  transform: scale(1.01);
+  border-color: #ff9800;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .card-main {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .card-info {
-  flex: 0 0 180px;
+  flex: 0 0 200px;
 }
 .date {
-  font-size: 0.7rem;
-  color: #94a3b8;
+  font-size: 0.75rem;
+  color: #6c757d;
   font-weight: 700;
   display: block;
-  margin-bottom: 0.125rem;
+  margin-bottom: 0.25rem;
 }
 .exercise-title {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  color: #1e293b;
+  color: #000;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -553,78 +641,91 @@ const formatDate = (dateStr: string) => {
   flex: 1;
   display: flex;
   align-items: center;
-  overflow-x: auto;
-  padding-bottom: 4px; /* スクロールバー用 */
 }
-.card-sets::-webkit-scrollbar { height: 4px; }
-.card-sets::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
 
 .set-chips {
   display: flex;
-  gap: 0.375rem;
+  gap: 0.5rem;
 }
 .set-chip {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  background: #f8f9fa;
+  border: 1px solid #eee;
+  padding: 0.35rem 0.75rem;
+  border-radius: 10px;
   display: flex;
   align-items: baseline;
-  gap: 0.2rem;
-  white-space: nowrap;
+  gap: 0.25rem;
 }
-.set-chip .weight { font-size: 0.8125rem; font-weight: 800; color: #0f172a; }
-.set-chip .weight small { font-size: 0.6rem; color: #94a3b8; margin-left: 1px; }
-.set-chip .reps { font-size: 0.75rem; font-weight: 700; color: #64748b; }
+.set-chip .weight { font-size: 0.9rem; font-weight: 800; color: #ff9800; }
+.set-chip .weight small { font-size: 0.65rem; color: #666; }
+.set-chip .reps { font-size: 0.8rem; font-weight: 700; color: #000; }
 
 .set-more {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
+  color: #6c757d;
   font-weight: 900;
-  color: #94a3b8;
-  padding: 0 0.25rem;
-  letter-spacing: 0.1em;
+  padding: 0 0.5rem;
 }
 
-.summary-line { display: flex; gap: 0.75rem; font-size: 0.8125rem; font-weight: 700; color: #64748b; }
+.summary-line { 
+  display: flex; 
+  gap: 1rem; 
+  font-size: 0.85rem; 
+  font-weight: 700; 
+  color: #adb5bd; 
+}
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.summary-item .mdi {
+  color: #ff9800;
+}
 
 .card-actions {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.5rem;
   flex: 0 0 auto;
 }
 .icon-btn {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8f9fa;
+  border: 1px solid #eee;
   cursor: pointer;
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 1.1rem;
   transition: all 0.2s;
+  color: #666;
 }
-.icon-btn:hover { background: #eff6ff; border-color: #3b82f6; }
-.icon-btn.del:hover { background: #fef2f2; border-color: #ef4444; }
+.edit-btn:hover { background: #fff; color: #ff9800; border-color: #ff9800; box-shadow: 0 4px 10px rgba(255,152,0,0.1); }
+.del-btn:hover { background: #fff; color: #dc3545; border-color: #dc3545; box-shadow: 0 4px 10px rgba(220,53,69,0.1); }
 
 .card-note {
-  margin: 0.5rem 0 0 0;
-  font-size: 0.75rem;
-  color: #64748b;
-  background: #f8fafc;
-  padding: 0.375rem 0.75rem;
-  border-radius: 6px;
-  border-left: 3px solid #e2e8f0;
+  margin: 1rem 0 0 0;
+  font-size: 0.85rem;
+  color: #666;
+  background: #f8f9fa;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border-left: 4px solid #ff9800;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.card-note .mdi {
+  color: #ff9800;
+  font-size: 1.1rem;
 }
 
 @media (max-width: 768px) {
   .card-main { flex-wrap: wrap; }
-  .card-info { flex: 1 1 100%; margin-bottom: 0.5rem; }
-  .card-sets { flex: 1; }
+  .card-info { flex: 1 1 100%; margin-bottom: 0.75rem; }
+  .card-sets { flex: 1; margin-bottom: 0.75rem; }
+  .card-actions { width: 100%; justify-content: flex-end; }
 }
 </style>

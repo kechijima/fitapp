@@ -190,14 +190,16 @@ watch(() => props.defaultWorkTime, (val) => {
 <style scoped>
 .timer-card {
   background: #0f172a;
-  border-radius: 24px;
-  padding: 2rem;
+  border-radius: 20px;
+  padding: 1.25rem;
   color: white;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.3);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   position: relative;
-  border: 4px solid #1e293b;
+  border: 3px solid #1e293b;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
 .timer-card.work { border-color: #00dc82; }
@@ -231,9 +233,9 @@ watch(() => props.defaultWorkTime, (val) => {
 
 .time-display-wrapper {
   position: relative;
-  width: 180px;
-  height: 180px;
-  margin: 0 auto 1.5rem;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 1.25rem;
 }
 
 .progress-ring {
@@ -261,7 +263,7 @@ watch(() => props.defaultWorkTime, (val) => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 3rem;
+  font-size: 2.25rem;
   font-weight: 800;
   font-family: 'JetBrains Mono', monospace;
 }
@@ -301,6 +303,23 @@ watch(() => props.defaultWorkTime, (val) => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+}
+@media (max-width: 600px) {
+  .timer-card {
+    padding: 1rem;
+    max-width: 100%;
+    border-radius: 16px;
+  }
+  .time-display-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+  .time-main {
+    font-size: 1.8rem;
+  }
+  .round-display .value {
+    font-size: 1.25rem;
+  }
 }
 .btn {
   padding: 0.75rem;

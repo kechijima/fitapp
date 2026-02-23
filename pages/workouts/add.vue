@@ -17,6 +17,7 @@ const sets = ref([{ weight: null, reps: null }])
 const note = ref('')
 const submitting = ref(false)
 const showSuccessOverlay = ref(false)
+const showTimer = ref(false)
 
 // タイマー設定用のデフォルト値
 const defaultRestTime = ref(60)
@@ -120,7 +121,7 @@ const submitWorkout = async () => {
 <template>
   <div class="add-container">
     <div class="header">
-      <h1>📝 ワークアウト記録</h1>
+      <h1><span class="mdi mdi-clipboard-edit-outline"></span> ワークアウト記録</h1>
       <p class="subtitle">
         {{ targetDate ? targetDate + ' の記録' : '今日のトレーニングを詳細に記録しましょう' }}
       </p>
@@ -171,8 +172,12 @@ const submitWorkout = async () => {
                 <input type="number" min="0" v-model="set.reps" placeholder="0" />
               </div>
               <div class="set-actions">
-                <button v-if="index > 0" type="button" @click.stop="copyLastSet(index)" class="btn-icon" title="前セットをコピー">📋</button>
-                <button v-if="sets.length > 1" type="button" @click.stop="removeSet(index)" class="btn-icon btn-delete" title="削除">×</button>
+                <button v-if="index > 0" type="button" @click.stop="copyLastSet(index)" class="btn-icon" title="前セットをコピー">
+                  <span class="mdi mdi-content-copy"></span>
+                </button>
+                <button v-if="sets.length > 1" type="button" @click.stop="removeSet(index)" class="btn-icon btn-delete" title="削除">
+                  <span class="mdi mdi-close"></span>
+                </button>
               </div>
             </div>
           </div>
@@ -184,7 +189,7 @@ const submitWorkout = async () => {
           <!-- メモ欄のデザイン修正 -->
           <div class="form-group note-area">
             <label for="note" class="note-label">
-              <span class="icon">✍️</span> メモ
+              <span class="mdi mdi-note-edit-outline icon"></span> メモ
             </label>
             <div class="textarea-wrapper">
               <textarea 
@@ -198,20 +203,29 @@ const submitWorkout = async () => {
 
           <div class="actions">
             <button @click="submitWorkout" class="btn btn-submit" :disabled="submitting">
-              {{ submitting ? '保存中...' : '📊 記録を完了する' }}
+              <span class="mdi mdi-chart-bar"></span> {{ submitting ? '保存中...' : '記録を完了する' }}
             </button>
             <NuxtLink to="/workouts" class="btn btn-cancel">キャンセル</NuxtLink>
           </div>
-        </div>
-      </div>
 
-      <div class="timer-section">
-        <WorkoutTimer 
-          :default-rest-time="defaultRestTime" 
-          :default-work-time="defaultWorkTime"
-          :current-set="currentSetIndex + 1"
-          :total-sets="sets.length"
-        />
+          <div class="timer-toggle-area">
+            <button type="button" @click="showTimer = !showTimer" class="btn-timer-toggle">
+              <span class="mdi" :class="showTimer ? 'mdi-timer-off-outline' : 'mdi-timer-outline'"></span>
+              {{ showTimer ? 'タイマーを隠す' : 'タイマーを表示する' }}
+            </button>
+          </div>
+
+          <Transition name="slide-fade">
+            <div v-if="showTimer" class="inline-timer-section">
+              <WorkoutTimer 
+                :default-rest-time="defaultRestTime" 
+                :default-work-time="defaultWorkTime"
+                :current-set="currentSetIndex + 1"
+                :total-sets="sets.length"
+              />
+            </div>
+          </Transition>
+        </div>
       </div>
     </div>
 
@@ -219,7 +233,7 @@ const submitWorkout = async () => {
     <Transition name="fade">
       <div v-if="showSuccessOverlay" class="success-overlay">
         <div class="success-modal">
-          <div class="success-icon">✅</div>
+          <div class="success-icon mdi mdi-check-circle-outline"></div>
           <h2>記録完了！</h2>
           <p>お疲れ様でした。次のアクションを選択してください。</p>
           <div class="modal-actions">
@@ -239,26 +253,30 @@ const submitWorkout = async () => {
   padding: 1rem;
 }
 .header { margin-bottom: 2rem; }
-.header h1 { font-size: 1.75rem; color: #0f172a; font-weight: 800; letter-spacing: -0.025em; }
-.subtitle { color: #64748b; font-weight: 500; }
+.header h1 { 
+  font-size: 2rem; 
+  color: #000; 
+  font-weight: 800; 
+  letter-spacing: -0.025em; 
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.header h1 .mdi { color: var(--primary-color); }
+.subtitle { color: #666; font-weight: 500; }
 
 .main-layout {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 2.5rem;
-}
-
-@media (max-width: 950px) {
-  .main-layout { grid-template-columns: 1fr; }
-  .timer-section { order: -1; margin-bottom: 2rem; }
+  display: block;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .form-card {
   background: white;
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f1f5f9;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
 }
 
 .select-wrapper {
@@ -267,33 +285,34 @@ const submitWorkout = async () => {
 .select-input {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 2px solid #e2e8f0;
+  border: 1px solid #dee2e6;
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
-  background-color: #f8fafc;
+  background-color: #f8f9fa;
   cursor: pointer;
   appearance: none;
   transition: all 0.2s;
+  color: #000;
 }
 .select-input:focus {
-  border-color: #00dc82;
+  border-color: var(--primary-color);
   background-color: white;
   outline: none;
-  box-shadow: 0 0 0 4px rgba(0, 220, 130, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 152, 0, 0.1);
 }
 
 .form-group { margin-bottom: 2rem; }
-label { display: block; margin-bottom: 0.75rem; font-weight: 800; color: #1e293b; font-size: 0.875rem; letter-spacing: 0.025em; }
+label { display: block; margin-bottom: 0.75rem; font-weight: 800; color: #000; font-size: 0.875rem; letter-spacing: 0.025em; }
 
 .sets-header {
   display: grid;
-  grid-template-columns: 40px 1fr 1fr 80px;
+  grid-template-columns: 40px 1fr 1fr 100px;
   gap: 0.5rem;
   padding: 0 0.75rem;
   font-size: 0.65rem;
   font-weight: 900;
-  color: #94a3b8;
+  color: #adb5bd;
   margin-bottom: 0.5rem;
   letter-spacing: 0.05em;
 }
@@ -301,83 +320,89 @@ label { display: block; margin-bottom: 0.75rem; font-weight: 800; color: #1e293b
 .sets-list { margin-bottom: 1.5rem; }
 .set-row {
   display: grid;
-  grid-template-columns: 40px 1fr 1fr 80px;
+  grid-template-columns: 40px 1fr 1fr 100px;
   gap: 0.5rem;
   align-items: center;
   margin-bottom: 0.5rem;
-  background: #f8fafc;
+  background: #f8f9fa;
   padding: 0.5rem 0.75rem;
   border-radius: 12px;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
 }
-.set-row:hover { background: #f1f5f9; }
+.set-row:hover { background: #f1f3f5; }
 .set-row.current-focus {
-  border-color: #00dc82;
+  border-color: var(--primary-color);
   background: white;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.set-number { font-weight: 900; color: #94a3b8; text-align: center; font-size: 1rem; }
+.set-number { font-weight: 900; color: #adb5bd; text-align: center; font-size: 1rem; }
 input { 
   width: 100%; 
   padding: 0.625rem 0.25rem; 
-  border: 2px solid #e2e8f0; 
+  border: 1px solid #dee2e6; 
   border-radius: 8px; 
   font-size: 0.9375rem; 
   font-weight: 700;
   text-align: center;
   transition: all 0.2s;
-  min-width: 0; /* 防止溢出 */
+  min-width: 0;
+  background: #fff;
+  color: #000;
 }
-input:focus { border-color: #00dc82; outline: none; background: #f0fff4; }
+input:focus { border-color: var(--primary-color); outline: none; background: #fffcf8; }
 
-.set-actions { display: flex; gap: 0.5rem; }
+.set-actions { display: flex; gap: 0.4rem; }
 .btn-icon {
   background: white;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #dee2e6;
   border-radius: 8px;
   width: 36px;
   height: 36px;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: #666;
 }
-.btn-icon:hover { border-color: #00dc82; transform: translateY(-2px); }
-.btn-delete:hover { border-color: #ef4444; color: #ef4444; }
+.btn-icon:hover { border-color: var(--primary-color); color: var(--primary-color); transform: translateY(-2px); }
+.btn-delete:hover { border-color: var(--error-color); color: var(--error-color); }
 
 .btn-add-set {
   width: 100%;
   padding: 1rem;
-  background: #f8fafc;
-  border: 2px dashed #cbd5e1;
+  background: #f8f9fa;
+  border: 1px dashed #ced4da;
   border-radius: 14px;
-  color: #64748b;
+  color: #6c757d;
   font-weight: 800;
   margin-bottom: 2.5rem;
   cursor: pointer;
   transition: all 0.2s;
 }
-.btn-add-set:hover { background: white; border-color: #00dc82; color: #00dc82; }
+.btn-add-set:hover { background: white; border-color: var(--primary-color); color: var(--primary-color); }
 
-/* メモ欄のプレミアムデザイン */
 .note-area {
-  background: #f8fafc;
+  background: #f8f9fa;
   padding: 1.25rem;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #eee;
 }
 .note-label {
   display: flex !important;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1rem !important;
-  color: #475569 !important;
+  color: #333 !important;
 }
 .textarea-wrapper textarea {
   width: 100%;
   padding: 1rem;
-  border: 2px solid #e2e8f0;
+  border: 1px solid #dee2e6;
   border-radius: 12px;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -385,25 +410,60 @@ input:focus { border-color: #00dc82; outline: none; background: #f0fff4; }
   min-height: 100px;
   transition: all 0.2s;
   background: white;
+  color: #000;
 }
 .textarea-wrapper textarea:focus {
-  border-color: #00dc82;
+  border-color: var(--primary-color);
   outline: none;
-  box-shadow: 0 4px 12px rgba(0, 220, 130, 0.1);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.1);
 }
 
-.actions { display: flex; gap: 1rem; margin-top: 2.5rem; }
-.btn { flex: 1; padding: 1.125rem; border-radius: 14px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; font-size: 1rem; border: none; transition: all 0.2s; }
-.btn-submit { background: #00dc82; color: #064e3b; box-shadow: 0 4px 6px -1px rgba(0, 220, 130, 0.2); }
-.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 220, 130, 0.3); }
-.btn-cancel { background: #f1f5f9; color: #475569; }
+.actions { display: flex; gap: 1rem; margin-top: 2.5rem; margin-bottom: 1.5rem; }
+.btn { flex: 1; padding: 1.125rem; border-radius: 14px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; font-size: 1rem; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+
+.timer-toggle-area {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.btn-timer-toggle {
+  background: none;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  color: #666;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+.btn-timer-toggle:hover {
+  background: #f8f9fa;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.inline-timer-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.slide-fade-enter-active, .slide-fade-leave-active { transition: all 0.3s ease; }
+.slide-fade-enter-from, .slide-fade-leave-to { opacity: 0; transform: translateY(-10px); }
+
+.btn-submit { background: var(--primary-color); color: #000; box-shadow: 0 4px 15px rgba(255, 152, 0, 0.2); }
+.btn-submit:hover { transform: translateY(-2px); background: var(--primary-dark); box-shadow: 0 8px 25px rgba(255, 152, 0, 0.3); }
+.btn-cancel { background: #f1f3f5; color: #495057; }
 .btn:active { transform: scale(0.98); }
 
-/* 保存成功オーバーレイ */
 .success-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
@@ -418,19 +478,19 @@ input:focus { border-color: #00dc82; outline: none; background: #f0fff4; }
   max-width: 440px;
   width: 100%;
   text-align: center;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes modalIn {
   from { opacity: 0; transform: scale(0.9) translateY(20px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
-.success-icon { font-size: 4rem; margin-bottom: 1.5rem; }
-.success-modal h2 { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin-bottom: 0.75rem; }
-.success-modal p { color: #64748b; margin-bottom: 2rem; font-weight: 500; }
+.success-icon { font-size: 4rem; color: var(--primary-color); margin-bottom: 1.5rem; }
+.success-modal h2 { font-size: 1.75rem; font-weight: 800; color: #000; margin-bottom: 0.75rem; }
+.success-modal p { color: #666; margin-bottom: 2rem; font-weight: 500; }
 .modal-actions { display: flex; flex-direction: column; gap: 0.75rem; }
-.btn-outline { background: white; border: 2px solid #e2e8f0; color: #64748b; }
-.btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+.btn-outline { background: white; border: 1px solid #dee2e6; color: #666; }
+.btn-outline:hover { background: #f8f9fa; border-color: #ced4da; }
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }

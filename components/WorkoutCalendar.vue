@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
-  workoutDates: string[] // 'YYYY-MM-DD'
+  workoutDates: string[], // 'YYYY-MM-DD'
+  selectedDate?: string | null
 }>()
 
 const emit = defineEmits(['select-date'])
@@ -72,7 +73,11 @@ const nextMonth = () => {
         v-for="(date, index) in calendarDays" 
         :key="index" 
         class="calendar-day"
-        :class="{ 'has-workout': date.hasWorkout, empty: !date.day }"
+        :class="{ 
+          'has-workout': date.hasWorkout, 
+          'empty': !date.day,
+          'selected': date.fullDate === props.selectedDate
+        }"
         @click="date.fullDate && emit('select-date', date.fullDate)"
       >
         <span v-if="date.day">{{ date.day }}</span>
@@ -137,6 +142,14 @@ const nextMonth = () => {
   background: #eff6ff;
   font-weight: 700;
   color: #3b82f6;
+}
+.calendar-day.selected {
+  background: #ff9800 !important;
+  color: #000 !important;
+  box-shadow: 0 4px 10px rgba(255, 152, 0, 0.4);
+}
+.calendar-day.selected .dot {
+  background: #000;
 }
 .dot {
   width: 4px;
